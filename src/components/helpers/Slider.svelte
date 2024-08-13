@@ -54,10 +54,13 @@ Usage:
 	let _current = writable();
 	let _count = writable();
 
+	$: console.log({current, direction})
+
 	const move = (val, jump) => {
 		if (!isInView) return false;
 		const target = jump ? val : index + val;
 		index = Math.max(0, Math.min(children - 1, target));
+
 		current = index;
 	};
 
