@@ -4,6 +4,8 @@
 	import Tap from "$components/helpers/Tap.svelte";
 	import Slide1 from "../content/Slide1.svelte";
 	import Slide2 from "../content/Slide2.svelte";
+	import Slide2_2 from "../content/Slide2_2.svelte";
+	import Slide2_3 from "../content/Slide2_3.svelte";
 	import Slide3 from "../content/Slide3.svelte";
 	import Slide4 from "../content/Slide4.svelte";
 
@@ -34,6 +36,12 @@
 				</Slide>
 				<Slide index={1}>
 					<Slide2/>
+				</Slide>
+				<Slide index={2}>
+					<Slide2_2/>
+				</Slide>
+				<Slide index={3}>
+					<Slide2_3/>
 				</Slide>
 			</Slider>
 		</Slide>

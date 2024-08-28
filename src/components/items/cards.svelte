@@ -3,7 +3,10 @@
   import { createEventDispatcher } from 'svelte';
   import { fade } from 'svelte/transition';
   import { allCards } from './cards.js';
-	import {lockedCard} from '../../stores/misc.js'
+	import {lockedCard, currentCard} from '../../stores/misc.js'
+  import {arrayCards} from '../../stores/misc.js'
+  
+
   import facedown from '../../svg/Cards_png/back.png'
 
   const suits = ["Spades", "Diamonds", "Hearts", "Clubs"];
@@ -20,12 +23,21 @@
   }
 
   function getUniqueCards(deck) {
-    return deck.sort(() => Math.random() - 0.5).slice(0, 27).map((card, index) => ({ ...card, index }));
-  }
+  return deck.sort(() => Math.random() - 0.5)
+    .slice(0, 27)
+    .map((card, index) => ({
+      ...card, 
+      index, 
+      currentIndex: index, 
+      selected: false
+    }));
+}
+
 
   const deck = generateDeck();
   let cards = getUniqueCards(deck);
 
+  $arrayCards = cards;
   console.log(cards);
 
   let spread = false;
@@ -58,10 +70,12 @@
     console.log('Card clicked:', card);
   }
 
+
   function lockInCard() {
     showConfirmation = false;
     showSelectedCard = true;
     flipped = true;
+    $currentCard = true
 
     setTimeout(() => {
       showPickedText = true;
@@ -72,6 +86,7 @@
     }, 700);
 
     console.log('Card locked in:', selectedCard);
+    console.log(currentCard)
   }
 
   function handleKeyDown(event, card) {
@@ -109,6 +124,7 @@
     {#if !showSelectedCard || card === selectedCard}
       <div
         class="card {spread ? 'spread' : 'pile'} {flipped && card === selectedCard ? 'flipped' : ''} {showCenterTransition && card === selectedCard ? 'card-center' : ''}"
+        class:selected={card === selectedCard}
         style="--index: {i};"
         tabindex="0"
         on:click={() => handleCardClick(card)}
@@ -170,13 +186,13 @@
   }
 
   .card:hover,
-  .card:focus {
+  .selected {
     transform: translateY(-50px);
   }
 
-  .card:focus {
+  /* .selected {
     box-shadow: 0 0 5px #333;
-  }
+  } */
 
   /* .pile {
     left: 0;

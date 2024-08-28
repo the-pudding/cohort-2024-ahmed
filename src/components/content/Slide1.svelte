@@ -8,7 +8,7 @@
 
 <div class= 'container'>
     <Cards/>
-    <p> your card is : {$lockedCard?.suit}</p>
+    <!-- <p> your card is : {$lockedCard?.suit}</p> -->
 </div>
 
 

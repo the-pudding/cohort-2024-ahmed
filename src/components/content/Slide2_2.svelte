@@ -1,0 +1,35 @@
+<script>
+    import Piles from "../items/piles2.svelte";
+    import Dacard from "../items/dacard.svelte";
+    import { lockedCard, currentCard } from '../../stores/misc.js';
+  </script>
+  
+  <div class= 'container'>
+    {#if $currentCard} 
+    <Dacard/>
+    {/if}
+    <Piles/>
+  </div>
+  
+  
+  <style>
+  
+      img {
+          height: auto;
+          width: 50%;
+          margin-top: 10%;
+          
+      }
+      h1{
+          text-align: center;
+          color: #3F3075;
+          margin-bottom: -0.4%;
+      }
+  
+      h3{
+          text-align: center;
+          color: #3F3075;
+          font-weight: 100;
+          margin-top: 0;
+      }
+  </style>

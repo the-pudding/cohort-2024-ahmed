@@ -54,7 +54,7 @@ Usage:
 	let _current = writable();
 	let _count = writable();
 
-	$: console.log({current, direction})
+	// $: console.log({current, direction})
 
 	const move = (val, jump) => {
 		if (!isInView) return false;
