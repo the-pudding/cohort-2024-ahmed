@@ -1,6 +1,6 @@
 <script>
     import { arrayCards, statuscard, cycle1array } from '../../stores/misc.js';
-    import KeyboardUp from '../items/KeyboardUp.svelte';
+    import Arrow from '../items/Arrow.svelte';
 
     let rows = [];
     const getSelectedPile = () => {
@@ -46,28 +46,84 @@
         return suit;
     }
 
-    
+
+    let selectedEl = null;
+    let note;
+    let board;
+    const elMap = new Map();
+  
+    let layoutVersion = 0;
+    const invalidate = () => { layoutVersion += 1; };
+  
+    function collect(node, card) {
+      elMap.set(card.index, node);
+      if (card.selected) selectedEl = node;
+      invalidate();
+  
+      return {
+        update(newCard) {
+          if (newCard.index !== card.index) {
+            elMap.delete(card.index);
+            elMap.set(newCard.index, node);
+          }
+          // If selection changed, update selectedEl both ways
+          if (newCard.selected) {
+            selectedEl = node;
+          } else if (!newCard.selected && selectedEl === node) {
+            selectedEl = null;
+          }
+          card = newCard;
+          invalidate();
+        },
+        destroy() {
+          elMap.delete(card.index);
+          if (selectedEl === node) selectedEl = null;
+          invalidate();
+        }
+      };
+    }
 </script>
 
 <main class="body">
-    <!-- <KeyboardUp/> -->
     {#if $statuscard == true}
     <header class="header">
         <h1><u>The Second Cycle</u></h1>
         <p>Let's have a look at the cards inside the piles. <br> Here's where your card went.</p>
     </header>
-    <div class="container">
+    <div class="container" bind:this={board}>
         {#each rows as row}
             <div class="row">
                 {#each row as card}
                     <div
-                        class="rectangle {card.selected ? 'selected' : ''} {isInSelectedPile(card) ? 'in-pile' : ''}">
+                        class="rectangle {card.selected ? 'selected' : ''} {isInSelectedPile(card) ? 'in-pile' : ''}"
+                        use:collect={card}>
                         {DisplayValue(card.value)} of {DisplaySuit(card.suit)}
                     </div>
                 {/each}
             </div>
         {/each}
+
+        {#if selectedEl && note}
+        <Arrow
+          container={board}
+          fromEl={selectedEl}
+          toEl={note}
+          fromAnchor="right"
+          toAnchor="top"
+          headAt="start"
+          curvature={0.22}
+          bulge={0.16}
+          bulgeDir="up"
+          width={4}
+          color="#5a80c0"
+          version={layoutVersion}   
+        />
+      {/if}
+
     </div>
+
+    <div class="note" bind:this={note}>The Selected card</div>
+    
     <div class="footer">
     </div>
     <div class="footer2">
@@ -119,6 +175,7 @@
         width: 75%;
         align-items: center;
         /* margin-bottom: 15%; */
+          position: relative;   
 
     }
 
@@ -127,6 +184,14 @@
         justify-content: center;
         gap: 2%;
         width: 100%;
+    }
+
+    .note {
+      color: #5a80c0;
+      font-weight: 900;
+      font-size: 2rem;
+      font-family: "Nanum Pen Script", cursive;
+      /* margin: 3% 0 3% 0; */
     }
 
     .rectangle {

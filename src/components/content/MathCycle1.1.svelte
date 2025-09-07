@@ -75,7 +75,7 @@
             toEl={note}
             fromAnchor="left"
             toAnchor="bottom"
-            headAt="end"
+            headAt="start"
             curvature={0.22}
             bulge={0.16}
             bulgeDir="up"
