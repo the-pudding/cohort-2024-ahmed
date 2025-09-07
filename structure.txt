@@ -1,0 +1,22 @@
+Routes: 
+    Welcome: The Welcome green magic/match
+    MagicPick: The pick a card slide
+    MagicCycle1: Cycle 1 of Magic
+    MagicCycle2: Cycle 2 of Magic
+    MagicCycle3: Cycle 3 of Magic
+
+    MathCycle1.1: 
+
+
+Componenets:
+    /Demo/Demo.Slider.svelte: basically it has the mechanism for the postioning of routes/slides
+
+
+Items:
+    Dacard: is your selected card at the top left
+    Piles: everything regarding the cards in each cycle
+
+
+Stores:
+    lockedcard: the card you selected
+    arraycards: Is the array of cards generated at first

@@ -1,0 +1,26 @@
+<svg width="336" height="494" viewBox="0 0 336 494" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_d_189_20819)">
+<rect x="20" y="16" width="295.1" height="454" rx="66" fill="#E5DEFF"/>
+<rect x="12" y="8" width="311.1" height="470" rx="74" stroke="#8F83B8" stroke-width="16" stroke-linejoin="round"/>
+</g>
+<g clip-path="url(#clip0_189_20819)">
+<path d="M167.952 167L230.233 242.952L167.952 318.905L105.671 242.952L167.952 167Z" fill="#8F83B8"/>
+</g>
+<path d="M115.386 69.596C112.117 78.7556 109.156 87.0575 106.502 94.5017C105.369 97.6735 104.252 100.813 103.152 103.92C102.051 106.995 101.032 109.811 100.093 112.368C99.1869 114.892 98.4263 117.028 97.8114 118.776C97.1964 120.524 96.808 121.608 96.6462 122.029L71.2065 120.573L93.6362 72.3147L67.2254 73.7712V52.798L115.386 51.9241V69.596Z" fill="#8F83B8"/>
+<path d="M208.614 428.404C211.883 419.244 214.844 410.943 217.498 403.498C218.631 400.326 219.748 397.187 220.848 394.08C221.949 391.005 222.968 388.189 223.907 385.632C224.813 383.108 225.574 380.972 226.189 379.224C226.804 377.476 227.192 376.392 227.354 375.971L252.794 377.427L230.364 425.685L256.775 424.229L256.775 445.202L208.614 446.076L208.614 428.404Z" fill="#8F83B8"/>
+<defs>
+<filter id="filter0_d_189_20819" x="0" y="0" width="335.1" height="494" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="4"/>
+<feGaussianBlur stdDeviation="2"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_189_20819"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_189_20819" result="shape"/>
+</filter>
+<clipPath id="clip0_189_20819">
+<rect width="151.905" height="151.905" fill="white" transform="translate(92 167)"/>
+</clipPath>
+</defs>
+</svg>
