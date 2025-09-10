@@ -150,16 +150,17 @@
       font-weight: bold;
       color: white;
       text-align: center;
+      border-radius:6px;
       transition: transform 0.2s ease;
     }
-    .rectangle.selected { background-color: #A34C48; }
+    .rectangle.selected { color: #A34C48; }
   
     .note {
       color: #5a80c0;
       font-weight: 900;
       font-size: 2rem;
       font-family: "Nanum Pen Script", cursive;
-      margin: 3% 0 3% 0;
+      margin: 1% 0 1% 0;
     }
   </style>
   

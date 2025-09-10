@@ -264,9 +264,27 @@
       position:absolute; width:100%; height:23px; background:#F09D99;
       display:flex; align-items:center; justify-content:center;
       font-size:0.8rem; font-weight:700; color:#fff; transition: transform 0.2s ease;
+      border-radius:6px;
     }
-    .card.cycle-range{ background:#558ABB; }
-    .card.selected{ background:#A34C48; outline:4px solid #558ABB; outline-offset:-4px; }
+    .card.cycle-range{ background: linear-gradient(to right, #F09D99 0 90%, #558ABB 90% 100%);}
+
+    .card.cycle-range::after{ content:"I";
+      position:absolute; right:0; top:0;
+      width:10%; height:100%;
+      display:flex; align-items:center; justify-content:center;
+      color:#fff; font-weight:900;
+      pointer-events:none;}
+
+    .card.selected{    color:#A34C48;
+       background: linear-gradient(to right, #F09D99 0 90%, #558ABB 90% 100%);}
+
+       .card.selected::after{content:"I";
+      position:absolute; right:0; top:0;
+      width:10%; height:100%;
+      display:flex; align-items:center; justify-content:center;
+      color:#fff; font-weight:900;
+      pointer-events:none;
+       }
   
     .note{ /* position:absolute; */
         left: calc(100% + 40px); 
