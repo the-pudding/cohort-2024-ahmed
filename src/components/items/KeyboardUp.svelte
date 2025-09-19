@@ -8,10 +8,17 @@
   export let disable = [];
   export let title = "Press the ‘UP key’ to see the magic trick!";
 
+  // Blink config (ms)
+  export let blinkDelay = 1500; // set to 15000 for 15s
+
   const dispatch = createEventDispatcher();
 
   let activeKey = '';
-  let timer;
+  let timer;            // pressed-state visual timer
+
+  // Blink state for the RIGHT key
+  let blinkRight = false;
+  let blinkTimerId;
 
   function setActive(dir) {
     activeKey = dir;
@@ -25,9 +32,18 @@
     dispatch('tap', dir);
   }
 
+  function resetBlinkTimer() {
+    clearTimeout(blinkTimerId);
+    blinkRight = false; // stop blinking immediately on interaction
+    blinkTimerId = setTimeout(() => {
+      blinkRight = true; // start blinking after the delay
+    }, blinkDelay);
+  }
+
   function tap(dir) {
     setActive(dir);
     fire(dir);
+    if (dir === 'right') resetBlinkTimer(); // reset timer on RIGHT click/tap
   }
 
   function handleKeydown(e) {
@@ -36,10 +52,16 @@
     const dir = map[e.key];
     if (!dir) return;
     e.preventDefault();
-    tap(dir);
+    tap(dir); // tap handles setActive + fire + possible reset
   }
 
-  onMount(() => () => clearTimeout(timer));
+  onMount(() => {
+    resetBlinkTimer(); // start initial countdown
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(blinkTimerId);
+    };
+  });
 </script>
 
 <!-- SSR-safe key handlers -->
@@ -52,12 +74,29 @@
   .container { width:30vw; aspect-ratio:3/2; max-width:200px; max-height:200px; display:flex; flex-direction:column; justify-content:center; align-items:center; }
   .keyboard { display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(2,1fr); gap:2%; width:100%; height:100%; }
   .key { display:flex; justify-content:center; align-items:center; border:none; border-radius:20%; background:#D47D79; color:#FCD4D4; cursor:pointer; opacity:.5; transition:background-color .2s, opacity .2s, transform .08s; }
-  .key.up { opacity:1; } /* keep the “up” key fully opaque */
+  .key.up { opacity:1; } /* keep the “up” key fully opaque if you like */
   .key.active, .key:active { background:#A34C48; transform: translateY(1px) scale(.98); }
   .key:disabled { opacity:.25; cursor:not-allowed; }
   .center { visibility:hidden; }
   .instruction { margin-top:10px; font-size:.8rem; color:#A34C48; text-align:center; font-family:'Kumbh Sans', sans-serif; font-weight:900; }
   .icon { width:clamp(18px,2.6vw,28px); height:clamp(18px,2.6vw,28px); }
+
+  /* --- Very visible blinking burgundy "stroke" for the RIGHT key --- */
+  @keyframes pulseStrokeRight {
+    0%, 100% {
+      outline: 0 solid transparent;
+      box-shadow: none;
+    }
+    50% {
+      outline: 3px solid #800020;               /* burgundy */
+      outline-offset: 0;
+      box-shadow: 0 0 0 4px rgba(128, 0, 32, 0.85);
+    }
+  }
+  .blink-right {
+    animation: pulseStrokeRight 0.9s infinite;   /* blink speed */
+    border-radius: 20%;
+  }
 </style>
 
 <div class='position'>
@@ -113,7 +152,7 @@
 
       {#if directions.includes('right')}
         <button
-          class="key {activeKey === 'right' ? 'active' : ''}"
+          class="key {activeKey === 'right' ? 'active' : ''} {blinkRight ? 'blink-right' : ''}"
           on:mousedown={() => tap('right')}
           on:touchstart|preventDefault={() => tap('right')}
           aria-label="Right"

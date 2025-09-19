@@ -2,23 +2,23 @@
   import { createEventDispatcher, onMount } from 'svelte';
   import ArrowIcon from './ArrowIcon.svelte';
 
-  // --- API parity points with Tap.svelte ---
-  export let enableKeyboard = true;                 // like Tap's enableKeyboard
+  export let enableKeyboard = true;
   export let directions = ['up', 'down', 'left', 'right'];
-  export let disable = [];                          // array of disabled directions
-
-  // Optional visual tweaks (safe defaults)
-  export let sticky = true;                         // keep in corner
+  export let disable = [];
+  export let sticky = true;
   export let title = "Press the ‘Down key’ to see what’s really happening!";
+  export let blinkDelay = 1500; // change to 15000 for 15s in production
 
   const dispatch = createEventDispatcher();
 
   let activeKey = '';
-  let timer;
+  let timer;            // for pressed-key visual
+  let blinkRight = false;
+  let blinkTimerId;     // <--- the blinking countdown timer
 
   function fire(dir) {
-    if (!directions.includes(dir)) return;          // ignore if not enabled
-    if (disable.includes(dir)) return;              // ignore if disabled
+    if (!directions.includes(dir)) return;
+    if (disable.includes(dir)) return;
     dispatch('tap', dir);
   }
 
@@ -28,9 +28,19 @@
     timer = setTimeout(() => (activeKey = ''), 150);
   }
 
+  // Restart the post-interaction countdown and stop blinking immediately
+  function resetBlinkTimer() {
+    clearTimeout(blinkTimerId);
+    blinkRight = false;                        // stop any current blinking
+    blinkTimerId = setTimeout(() => {
+      blinkRight = true;                       // resume blinking after delay
+    }, blinkDelay);
+  }
+
   function tap(dir) {
     setActive(dir);
     fire(dir);
+    if (dir === 'right') resetBlinkTimer();    // <--- reset timer on right click/tap
   }
 
   function handleKeydown(e) {
@@ -41,10 +51,16 @@
     e.preventDefault();
     setActive(dir);
     fire(dir);
+    if (dir === 'right') resetBlinkTimer();    // <--- reset timer on Right Arrow
   }
 
-  // Ensure no focus traps on SSR
-  onMount(() => () => clearTimeout(timer));
+  onMount(() => {
+    resetBlinkTimer();                         // start initial countdown
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(blinkTimerId);
+    };
+  });
 </script>
 
 <svelte:window on:keydown={handleKeydown} on:keyup={() => (activeKey = '')} />
@@ -58,10 +74,27 @@
   .key { display:flex; justify-content:center; align-items:center; border:none; border-radius:20%; background:#7c6fab; color:#BFAFF7; cursor:pointer; opacity:.5; transition:background-color .2s, opacity .2s, transform .08s; }
   .key.down { opacity:1; }
   .key.active, .key:active { background:#3F3075; transform: translateY(1px) scale(.98); }
-  .key:disabled { opacity: .25; cursor: not-allowed; }
+  .key:disabled { opacity:.25; cursor:not-allowed; }
   .center { visibility:hidden; }
   .instruction { margin-top:10px; font-size:.8rem; color:#3F3075; text-align:center; font-family:'Kumbh Sans', sans-serif; font-weight:900; }
   .icon { width:clamp(18px,2.6vw,28px); height:clamp(18px,2.6vw,28px); }
+
+  /* --- Blinking burgundy "stroke" for the RIGHT key --- */
+  @keyframes pulseStroke {
+    0%, 100% {
+      outline: 0 solid transparent;
+      box-shadow: none;
+    }
+    50% {
+      outline: 3px solid #5B4E88;               /* burgundy */
+      outline-offset: 0;
+      box-shadow: 0 0 0 4px rgba(91, 78, 136, 0.85);
+    }
+  }
+  .blink-right {
+    animation: pulseStroke 0.9s infinite;
+    border-radius: 20%;
+  }
 </style>
 
 <div class={sticky ? 'position' : ''} aria-label={title}>
@@ -117,7 +150,7 @@
 
       {#if directions.includes('right')}
         <button
-          class="key {activeKey === 'right' ? 'active' : ''}"
+          class="key {activeKey === 'right' ? 'active' : ''} {blinkRight ? 'blink-right' : ''}"
           on:mousedown={() => tap('right')}
           on:touchstart|preventDefault={() => tap('right')}
           aria-label="Right"
