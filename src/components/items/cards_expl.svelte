@@ -17,7 +17,7 @@
     {#each $arrayCards as card, i}
       <div
         class="card"
-        style="--index: {i};"
+        style="--index:{i}; z-index:{26 - i};"
         tabindex="0"
         on:click={() => handleCardClick(card)}
       >
@@ -40,7 +40,7 @@
       width: 130px;
       height: 200px;
       position: absolute;
-      transition: transform 0.5s, left 0.8s;
+      transition: transform 0.5s, left 0.9s;
       cursor: pointer;
       outline: none;
       transform-style: preserve-3d;
@@ -49,7 +49,7 @@
     }
   
     .card:hover {
-      transform: translateY(-150px);
+      transform: translateY(-120px);
     }
   
     .card-front {

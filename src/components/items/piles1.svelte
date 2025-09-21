@@ -159,7 +159,7 @@
               disabled={success && pileI !== successPile}
             >
               {#if success && pileI === successPile}
-                Great, now let's move to the next cycle!
+                <p style='font-size: 0.7em'>Great, now let's move to the next cycle!</p>
               {:else}
                 Pile {pileI}
               {/if}

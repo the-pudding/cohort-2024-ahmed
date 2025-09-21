@@ -83,8 +83,10 @@
 	function upMapFromY1(h) {
 	  if (h <= 1) return 1;      // 0/1 -> 1
 	  if (h <= 3) return 2;      // 2/3 -> 2
-	  if (h <= 7) return 4;      // 4/5/6/7 -> 4
-	  return 5;                  // 8/9 -> 5
+	  if (h <= 5) return 3; 
+	  if (h <= 7) return 4;
+	  if (h <= 8) return 5;       // 4/5/6/7 -> 4
+	  return 6;                  // 8/9 -> 5
 	}
   
 	// --- Wrap-around inside a row (skip v0-h0) ---

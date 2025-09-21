@@ -1,6 +1,6 @@
 <script>
     import { crossfade, scale } from "svelte/transition";
-    import { arrayCards } from "../../stores/misc.js";
+    import { cycle3array } from "../../stores/misc.js";
     // If you need to force-bundle assets, keep this import:
   
     // Your helper
@@ -31,12 +31,12 @@
     $: count = midPile.length;
   
     // Initialize from your store (first 27 cards; ensure index 0..26)
-    $: if ($arrayCards?.length && leftPile.length === 0 && midPile.length === 0) {
-      leftPile = $arrayCards.slice(0, 27).map((c, i) => ({ ...c, index: i }));
+    $: if ($cycle3array?.length && leftPile.length === 0 && midPile.length === 0) {
+      leftPile = $cycle3array.slice(0, 27).map((c, i) => ({ ...c, cycle3pos: i }));
     }
   
     async function drawOne() {
-      if (!leftPile.length || midPile.length >= 15) return;
+      if (!leftPile.length || midPile.length >= 14) return;
       playDeal();
       const card = leftPile[0];
       leftPile = leftPile.slice(1);
@@ -48,7 +48,7 @@
     async function dealToFifteen() {
       if (dealing) return;
       dealing = true;
-      while (midPile.length < 15 && leftPile.length) {
+      while (midPile.length < 14 && leftPile.length) {
         drawOne();
         await new Promise(r => setTimeout(r, 250));
       }
@@ -56,8 +56,8 @@
     }
   
     function reset() {
-      if ($arrayCards?.length) {
-        leftPile = $arrayCards.slice(0, 27).map((c, i) => ({ ...c, index: i }));
+      if ($cycle3array?.length) {
+        leftPile = $cycle3array.slice(0, 27).map((c, i) => ({ ...c, cycle3pos: i }));
       } else {
         leftPile = [];
       }
@@ -73,11 +73,11 @@
     <section class="pile">
       <div class="title">Pile 1</div>
       <div class="stack">
-        {#each leftPile as card, i (card.index)}
+        {#each leftPile as card, i (card.cycle3pos)}
           <div
             class="cardwrap"
             style="--i:{i}; --z:{1000 - i};"
-            out:send={{ key: card.index }}>
+            out:send={{ key: card.cycle3pos }}>
             <img class="card-front" src={getCardSrc(card)} alt={`Card ${card.value} of ${card.suit}`} />
           </div>
         {/each}
@@ -88,11 +88,11 @@
     <section class="pile">
       <div class="title">Count: {count}</div>
       <div class="stack">
-        {#each midPile as card, i (card.index)}
+        {#each midPile as card, i (card.cycle3pos)}
           <div
             class="cardwrap2"
             style="--i:{i}; --z:{1000 + i};"
-            in:receive={{ key: card.index }}>
+            in:receive={{ key: card.cycle3pos }}>
             <img class="card-front" src={getCardSrc(card)} alt={`Card ${card.value} of ${card.suit}`} />
           </div>
         {/each}
@@ -108,7 +108,7 @@
             class="bigcard-front"
             src={getCardSrc(lastCard)}
             alt={`Card ${lastCard.value} of ${lastCard.suit}`}
-            in:receive={{ key: lastCard.index }} />
+            in:receive={{ key: lastCard.cycle3pos }} />
         {:else}
           <div class="bigcard placeholder"></div>
         {/if}
@@ -117,8 +117,8 @@
   </main>
   
   <div class="controls">
-    <button on:click={drawOne} disabled={count >= 15 || !leftPile.length}>Draw one</button>
-    <button on:click={dealToFifteen} disabled={count >= 15 || dealing}>Deal to 15</button>
+    <button on:click={drawOne} disabled={count >= 14 || !leftPile.length}>Draw one</button>
+    <button on:click={dealToFifteen} disabled={count >= 14 || dealing}>Deal to 15</button>
     <button on:click={reset}>Reset</button>
   </div>
   

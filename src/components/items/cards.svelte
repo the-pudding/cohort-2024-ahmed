@@ -3,13 +3,22 @@
   import { createEventDispatcher } from 'svelte';
   import { fade } from 'svelte/transition';
   import { allCards } from './cards.js';
-	import {lockedCard, currentCard, statuscard, arrayCards, cycle1array, resetKey} from '../../stores/misc.js'
+  import {
+    lockedCard,
+    currentCard,
+    statuscard,
+    arrayCards,
+    cycle1array,
+    cycle2array,   // NEW import
+    cycle3array,   // NEW import
+    resetKey
+  } from '../../stores/misc.js'
   import { get } from 'svelte/store';
   
   let audioEl;
 
   import facedown from '../../svg/Cards_png/back.png'
-	import { TableColumnsSplitIcon } from 'lucide-svelte';
+  import { TableColumnsSplitIcon } from 'lucide-svelte';
 
   const suits = ["Spades", "Diamonds", "Hearts", "Clubs"];
   const values = Array.from({ length: 13 }, (_, i) => i + 1);
@@ -25,16 +34,16 @@
   }
 
   function getUniqueCards(deck) {
-  return deck.sort(() => Math.random() - 0.5)
-    .slice(0, 27)
-    .map((card, index) => ({
-      ...card, 
-      index, 
-      selected: false,
-    }));
-}
+    return deck.sort(() => Math.random() - 0.5)
+      .slice(0, 27)
+      .map((card, index) => ({
+        ...card, 
+        index, 
+        selected: false,
+      }));
+  }
 
-function hardReset() {
+  function hardReset() {
     // clear local UI/state
     selectedCard = null;
     showConfirmation = false;
@@ -53,6 +62,8 @@ function hardReset() {
     $statuscard  = false;
     $currentCard = false;
     $cycle1array = [];
+    $cycle2array = [];
+    $cycle3array = [];
 
     // restart the spread animation
     shuffleAndSpread();
@@ -71,7 +82,6 @@ function hardReset() {
     shuffleAndSpread();
     return unsub;
   });
-
 
   const deck = generateDeck();
   let cards = getUniqueCards(deck);
@@ -103,94 +113,102 @@ function hardReset() {
 
   function handleCardClick(card) {
     selectedCard = card;
-		$lockedCard = card;
+    $lockedCard = card;
     showConfirmation = true;
     dispatch('cardSelected', card);
     console.log('Card clicked:', card);
   }
 
+  /**
+   * Helper: assign one cycle (pile + pos) based on a reference key.
+   *
+   * EXACT cycle-1 behavior preserved:
+   * - pile = (ref % 3) mapped to 1,2,3
+   * - sort each pile by reference **descending** (inverted) — this matches your original cycle1pos rule
+   * - pile containing selected card => positions 9..17
+   * - among the remaining two piles, the smaller pile number => 0..8; the other => 18..26
+   *
+   * We use the same rule for cycle2 and cycle3, just changing the reference key.
+   *
+   * @param {Array} arr - array of card objects (mutated in place)
+   * @param {string} referenceKey - 'index' | 'cycle1pos' | 'cycle2pos'
+   * @param {string} pileKey - 'cycle1pile' | 'cycle2pile' | 'cycle3pile'
+   * @param {string} posKey  - 'cycle1pos'  | 'cycle2pos'  | 'cycle3pos'
+   */
+  function assignCycleInverted(arr, referenceKey, pileKey, posKey) {
+    // 1) assign pile id based on reference
+    for (const c of arr) {
+      const ref = c[referenceKey];
+      const mod = ((ref % 3) + 3) % 3; // just in case
+      c[pileKey] = mod === 0 ? 1 : (mod === 1 ? 2 : 3);
+    }
+
+    // 2) build piles
+    const piles = { 1: [], 2: [], 3: [] };
+    for (const c of arr) piles[c[pileKey]].push(c);
+
+    // 3) sort each pile by reference **descending** (inverted) — matches your original cycle1 code
+    for (const pid of [1,2,3]) {
+      piles[pid].sort((a,b) => b[referenceKey] - a[referenceKey]);
+    }
+
+    // 4) find selected pile id (the one that contains selected === true)
+    const selectedEntry = arr.find(c => c.selected);
+    const selectedPileId = selectedEntry ? selectedEntry[pileKey] : 1;
+
+    // Order the other piles by their numeric id
+    const otherPileIds = [1,2,3].filter(p => p !== selectedPileId);
+    const lowOther = Math.min(...otherPileIds);
+    const highOther = Math.max(...otherPileIds);
+
+    // 5) assign positions
+    // lowOther => 0..8
+    piles[lowOther].forEach((card, i) => { card[posKey] = i; });
+    // selected => 9..17
+    piles[selectedPileId].forEach((card, i) => { card[posKey] = 9 + i; });
+    // highOther => 18..26
+    piles[highOther].forEach((card, i) => { card[posKey] = 18 + i; });
+  }
 
   function lockInCard() {
     $statuscard = true;
 
-// Step 1: Mark the selected card
-$arrayCards = $arrayCards.map(card => {
-    if (card.suit === selectedCard.suit && card.value === selectedCard.value) {
+    // Step 1: Mark the selected card in $arrayCards
+    $arrayCards = $arrayCards.map(card => {
+      if (card.suit === selectedCard.suit && card.value === selectedCard.value) {
         return { ...card, selected: true };
-    }
-    return card;
-});
- // Step 2: Calculate cycle1pile
- $arrayCards = $arrayCards.map(card => ({
-        ...card,
-        cycle1pile: card.index % 3 === 0 ? 1 : card.index % 3 === 1 ? 2 : 3,
-    }));
-
-    // Step 3: Assign cycle1pos
-    // Group cards by cycle1pile
-    const piles = {
-        1: [],
-        2: [],
-        3: []
-    };
-
-    $arrayCards.forEach(card => {
-        piles[card.cycle1pile].push(card);
+      }
+      return card;
     });
 
-    // Sort piles by index in descending order
-    Object.values(piles).forEach(pile => {
-        pile.sort((a, b) => b.index - a.index);
-    });
+    // ---- CYCLE 1 (reference: index) ----
+    assignCycleInverted($arrayCards, 'index', 'cycle1pile', 'cycle1pos');
 
-    // Determine the pile with the selected card
-    let selectedPile = Object.values(piles).find(pile =>
-        pile.some(card => card.selected)
-    );
-
-    // Assign cycle1pos for the selected pile (9 to 17)
-    selectedPile.forEach((card, i) => {
-        card.cycle1pos = 9 + i;
-    });
-
-    // Assign cycle1pos for the other piles
-    const otherPiles = Object.values(piles).filter(pile => pile !== selectedPile);
-
-    // Assign cycle1pos (0 to 8) to the pile with the least number
-    const pileWithLeastNumber = otherPiles.reduce((minPile, currentPile) =>
-        currentPile.length < minPile.length ? currentPile : minPile
-    );
-    pileWithLeastNumber.forEach((card, i) => {
-        card.cycle1pos = i;
-    });
-
-    // Assign cycle1pos (18 to 26) to the last pile
-    const remainingPile = otherPiles.find(pile => pile !== pileWithLeastNumber);
-    remainingPile.forEach((card, i) => {
-        card.cycle1pos = 18 + i;
-    });
-
-    // Merge the updated piles back into $arrayCards and sort them
-    $arrayCards = [...piles[1], ...piles[2], ...piles[3]];
-
-    $arrayCards.sort((a, b) => a.index - b.index);
-
+    // keep a sorted view for next step
     $cycle1array = $arrayCards.slice().sort((a, b) => a.cycle1pos - b.cycle1pos);
 
-  
+    // ---- CYCLE 2 (reference: cycle1pos) ----
+    assignCycleInverted($arrayCards, 'cycle1pos', 'cycle2pile', 'cycle2pos');
+    $cycle2array = $arrayCards.slice().sort((a, b) => a.cycle2pos - b.cycle2pos);
+
+    // ---- CYCLE 3 (reference: cycle2pos) ----
+    assignCycleInverted($arrayCards, 'cycle2pos', 'cycle3pile', 'cycle3pos');
+    $cycle3array = $arrayCards.slice().sort((a, b) => a.cycle3pos - b.cycle3pos);
+
     // Log updated array for debugging
-    console.log("New card array",$arrayCards);
-    console.log("status card is",$statuscard)
-    
+    console.log("New card array", $arrayCards);
+    console.log("status card is", $statuscard);
+
     showConfirmation = false;
     showSelectedCard = true;
     flipped = true;
-    $currentCard = true
+    $currentCard = true;
+
     if (audioEl) {
-              setTimeout(() => {
-               audioEl.play();
-                                }, 300);
-                  }
+      setTimeout(() => {
+        audioEl.play();
+      }, 300);
+    }
 
     setTimeout(() => {
       showPickedText = true;
@@ -256,7 +274,6 @@ $arrayCards = $arrayCards.map(card => {
   {/each}
 </div>
 
-
 {#if showConfirmation}
   <div class="confirmation" in:fade={{ duration: 300 }} out:fade={{ duration: 500 }}>
     <p>Sure about this card?</p>
@@ -272,110 +289,99 @@ $arrayCards = $arrayCards.map(card => {
 {/if}
 
 <style>
-
 @import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap');
 
+p {
+  color: #5B4E88;
+  margin: 0;
+  font-family: 'Kumbh Sans', sans-serif;
+}
 
-  p {
-    color: #5B4E88;
-    margin: 0;
-    font-family: 'Kumbh Sans', sans-serif;
-  }
-
- .card-container {
+.card-container {
   height: 300px;
   position: relative;
   max-width: 850px;
   margin: auto;
 }
 
+.card {
+  width: 130px;
+  height: 200px;
+  position: absolute;
+  transition: transform 0.5s, left 0.8s;
+  cursor: pointer;
+  outline: none;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  left: calc(((var(--index)) / 26) * (100% - 130px));
+  top: 50%;
+}
+
+.card:hover,
+.selected {
+  transform: translateY(-50px);
+}
+
+.confirmation {
+  position: absolute;
+  bottom: 200px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.card-front {
+  transform: rotateY(180deg);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+.card-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+.flipped {
+  transform: rotateY(180deg);
+  transition-delay: 0.7s;
+}
+
+.card-center {
+  left: 50% !important;
+  transform: translateX(-50%) rotateY(180deg) !important;
+  transition: transform 1s, left 1s;
+  z-index: 10;
+}
+
+.picked-text {
+  margin-top: 50px;
+  font-size: 1.8em;
+  color: #5B4E88;
+  text-align: center;
+  font-family: 'Kumbh Sans', sans-serif;
+}
+
+button {
+  background-color: #E5DEFF;
+  color: #5B4E88;
+  font-size: 1.5em;
+  font-weight: 500;
+  font-family: 'Kumbh Sans', sans-serif;
+}
+
+@media (max-width: 600px) {
   .card {
-    width: 130px;
-    height: 200px;
-    position: absolute;
-    transition: transform 0.5s, left 0.8s;
-    cursor: pointer;
-    outline: none;
-    backface-visibility: hidden;
-    transform-style: preserve-3d;
-		left: calc(((var(--index)) / 26) * (100% - 130px));
-    top: 50%;
+    width: 100px;
+    height: 138px;
+    left: calc(((var(--index)) / 26) * (100% - 100px));
   }
-
-  .card:hover,
-  .selected {
-    transform: translateY(-50px);
-  }
-
-  /* .selected {
-    box-shadow: 0 0 5px #333;
-  } */
-
-  /* .pile {
-    left: 0;
-  } */
-
-  .confirmation {
-    position: absolute;
-    bottom: 200px;
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    /* margin-top: 20%; */
-  }
-
-  .card-front {
-    transform: rotateY(180deg);
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-  }
-
-  .card-back {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-  }
-
-  .flipped {
-    transform: rotateY(180deg);
-    transition-delay: 0.7s;
-  }
-
-  .card-center {
-    left: 50% !important;
-    transform: translateX(-50%) rotateY(180deg) !important;
-    transition: transform 1s, left 1s;
-    z-index: 10;
-  }
-
-  .picked-text {
-    margin-top: 50px;
-    font-size: 1.8em;
-    color: #5B4E88;
-    text-align: center;
-    font-family: 'Kumbh Sans', sans-serif;
-  }
-
-  button {
-    background-color: #E5DEFF;
-    color: #5B4E88;
-    font-size: 1.5em;
-    font-weight: 500;
-    font-family: 'Kumbh Sans', sans-serif;
-  }
-
-  @media (max-width: 600px) {
-    .card {
-      width: 100px;
-      height: 138px;
-      left: calc(((var(--index)) / 26) * (100% - 100px));
-    }
-  }
+}
 </style>

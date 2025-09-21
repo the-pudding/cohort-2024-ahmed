@@ -14,8 +14,8 @@ import KeyboardUp from "../items/KeyboardUp.svelte";
     </div>
     
 <div class='text'>
-    <p>At this stage, there's no trickery involved. Your choice is completely random, and no card is being forced. We're just using a deck of <b>27 cards</b> instead of the <b>full 52 cards</b>.</p>
-    
+    <p>Try to replicate this using your card. Your choice is completely random, and no card is being forced. We're just using a deck of <b>27 cards</b> instead of the <b>full 52 cards</b>.</p>
+    <p style = 'font-size:1.1em'> <b>PS:</b> The cards displayed in way that flipped, so the last card from Magic would be the last card here too and last card to be dealt!</p>
 </div>
    
 </section>
@@ -47,14 +47,14 @@ import KeyboardUp from "../items/KeyboardUp.svelte";
         text-align: center;
         color: #A34C48;
         font-weight: 300;
-        font-size: 1.7em;
+        font-size: 1.4em;
         font-family: 'Kumbh Sans', sans-serif;
     }
 
     .text {
     width: 50%;
     margin: 0 auto; /* Centers horizontally */
-    display: flex; /* Enables flexbox */
+    /* display: flex;  */
     justify-content: center; /* Centers content horizontally */
     align-items: center; /* Centers content vertically */
     text-align: center; /* Ensures text alignment is centered */
