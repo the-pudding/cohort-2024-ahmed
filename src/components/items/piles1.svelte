@@ -6,7 +6,7 @@
 
   // your code
   import { allCards } from './cards.js';
-  import { arrayCards, currentCard } from '../../stores/misc.js';
+  import { arrayCards, currentCard, assembly1} from '../../stores/misc.js';
 
   const [send, receive] = crossfade({
     fallback(node) {
@@ -54,12 +54,13 @@
   }
 
   async function moveCardsToPiles() {
+    $assembly1 = true;
     animationStarted = true;
     for (let i = 0; i < cards.length; i++) {
       if (audioEl) audioEl.play();
 
       // mark dealt + assign pile in round-robin
-      cards[i].dealt = true;
+      cards[i].dealt1 = true;
       cards[i].pile = (i % 3) + 1;
       cards[i].zIndex = i + 1;
 
@@ -111,7 +112,7 @@
       {/if}
     </div>
 
-    {#each cards.filter((d) => !d.dealt) as card, i (`${card.value}_${card.suit}`)}
+    {#each cards.filter((d) => !d.dealt1) as card, i (`${card.value}_${card.suit}`)}
       <div
         id={`${card.value}_${card.suit}`}
         class="card {showButtons ? 'hover-enabled' : ''}"
@@ -137,7 +138,7 @@
   <div class="piles-container">
     {#each [1, 2, 3] as pileI}
       <div class={`pile-${pileI}`}>
-        {#each cards.filter((d) => d.dealt && d.pile === pileI) as card, i (`${card.value}_${card.suit}`)}
+        {#each cards.filter((d) => d.dealt1 && d.pile === pileI) as card, i (`${card.value}_${card.suit}`)}
           <div
             id={`${card.value}_${card.suit}`}
             class="card {showButtons ? 'hover-enabled' : ''}"

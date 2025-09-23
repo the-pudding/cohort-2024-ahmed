@@ -6,7 +6,7 @@
 
   // your code
   import { allCards } from './cards.js';
-  import { arrayCards, currentCard , cycle1array } from '../../stores/misc.js';
+  import { arrayCards, currentCard , cycle1array, assembly2} from '../../stores/misc.js';
 
   const [send, receive] = crossfade({
     fallback(node) {
@@ -25,20 +25,8 @@
   let audioEl;     // deal sound
   let errorAudio;  // wrong answer sound
 
-  // Safely derive cards from the store (never undefined)
-  $: cards = Array.isArray($cycle1array) ? $cycle1array : [];
-
-  // Derived lists (avoid inline filters in the markup)
-  $: undealt = cards.filter(Boolean).filter(d => !d.dealt);
-  $: piles = (() => {
-    const map = { 1: [], 2: [], 3: [] };
-    for (const c of cards) {
-      if (c?.dealt && (c.pile === 1 || c.pile === 2 || c.pile === 3)) {
-        map[c.pile].push(c);
-      }
-    }
-    return map;
-  })();
+  // keep cards reactive to the store
+  $: cards = $cycle1array;
 
   let animationDelay = 400;
   let showButtons = false;
@@ -49,15 +37,15 @@
   let successPile = null;
 
   // Get the selected card's pile number (1/2/3) from your data
-  function getSelectedCycle1PileNumber() {
-    const selectedCard = cards.find((c) => c?.selected === true);
+  function getSelectedCycle2PileNumber() {
+    const selectedCard = $cycle1array.find((c) => c.selected === true);
     if (!selectedCard) return null;
 
-    // Preferred: number like cycle1pile: 3
-    if (typeof selectedCard.cycle1pile === 'number') return selectedCard.cycle1pile;
+    // Preferred: flat number like "cycle2pile: 3" (matches your screenshot)
+    if (typeof selectedCard.cycle2pile === 'number') return selectedCard.cycle2pile;
 
-    // Fallbacks
-    const p = selectedCard?.cycle1pile?.pile;
+    // Fallbacks: nested or string like 'pile2'
+    const p = selectedCard?.cycle2pile?.pile;
     if (typeof p === 'number') return p;
     const m = /pile(\d+)/i.exec(String(p ?? ''));
     if (m) return Number(m[1]);
@@ -66,31 +54,18 @@
   }
 
   async function moveCardsToPiles() {
+    $assembly2 =true;
     animationStarted = true;
-
-    // Work from a fresh snapshot to avoid mutating in place
     for (let i = 0; i < cards.length; i++) {
-      if (audioEl) {
-        try { await audioEl.play(); } catch {}
-      }
+      if (audioEl) audioEl.play();
 
-      // immutably update the store so reactivity/flip stays correct
-      cycle1array.update(arr => {
-        const copy = arr.slice();
-        if (copy[i]) {
-          copy[i] = {
-            ...copy[i],
-            dealt: true,
-            pile: (i % 3) + 1,
-            zIndex: i + 1
-          };
-        }
-        return copy;
-      });
+      // mark dealt + assign pile in round-robin
+      cards[i].dealt2 = true;
+      cards[i].pile = (i % 3) + 1;
+      cards[i].zIndex = i + 1;
 
       await new Promise((r) => setTimeout(r, animationDelay));
     }
-
     showButtons = true;
   }
 
@@ -102,7 +77,7 @@
 
   // Handle pile button clicks
   function onPick(pileNumber, e) {
-    const selectedPile = getSelectedCycle1PileNumber();
+    const selectedPile = getSelectedCycle2PileNumber();
     if (selectedPile == null) return;
 
     if (pileNumber === selectedPile) {
@@ -116,10 +91,8 @@
       setTimeout(() => btn.classList.remove('shake'), 820);
 
       if (errorAudio) {
-        try {
-          errorAudio.currentTime = 0;
-          errorAudio.play();
-        } catch {}
+        errorAudio.currentTime = 0;
+        errorAudio.play();
       }
       console.log('Try again');
     }
@@ -139,14 +112,14 @@
       {/if}
     </div>
 
-    {#each undealt as card, i (card.value + '_' + card.suit)}
+    {#each cards.filter((d) => !d.dealt2) as card, i (`${card.value}_${card.suit}`)}
       <div
-        id={card.value + '_' + card.suit}
+        id={`${card.value}_${card.suit}`}
         class="card {showButtons ? 'hover-enabled' : ''}"
         style="--spread: {i * spreadFactor - (spreadFactor * 27) / 2}px; --index: {i}; z-index: {27 - i};"
         animate:flip
-        in:receive={{ key: card.value + '_' + card.suit }}
-        out:send={{ key: card.value + '_' + card.suit }}
+        in:receive={{ key: `${card.value}_${card.suit}` }}
+        out:send={{ key: `${card.value}_${card.suit}` }}
       >
         <img class="card-front" src={getCardSrc(card)} alt={`Card ${card.value} of ${card.suit}`} />
       </div>
@@ -155,10 +128,9 @@
 
   <div class="containerButton">
     {#if !animationStarted}
-      <p class='description'>
-        We'll split the deck into three face-up piles <span class="first">again</span>.
-        Always remember to keep an eye on which pile your card ends up in!
-      </p>
+    <p class='description'>We'll split the deck into three face-up piles <span
+      class="first">again</span>. Always remember to keep an eye on which pile your
+      card ends up in!</p>
       <button on:click={moveCardsToPiles}>Start Drawing</button>
     {/if}
   </div>
@@ -166,14 +138,14 @@
   <div class="piles-container">
     {#each [1, 2, 3] as pileI}
       <div class={`pile-${pileI}`}>
-        {#each piles[pileI] as card, i (card.value + '_' + card.suit)}
+        {#each cards.filter((d) => d.dealt2 && d.pile === pileI) as card, i (`${card.value}_${card.suit}`)}
           <div
-            id={card.value + '_' + card.suit}
+            id={`${card.value}_${card.suit}`}
             class="card {showButtons ? 'hover-enabled' : ''}"
             style="--spread: {i * spreadFactor - (spreadFactor * 9) / 2}px; --index: {i}; z-index: {card.zIndex + 100};"
             animate:flip
-            in:receive={{ key: card.value + '_' + card.suit }}
-            out:send={{ key: card.value + '_' + card.suit }}
+            in:receive={{ key: `${card.value}_${card.suit}` }}
+            out:send={{ key: `${card.value}_${card.suit}` }}
           >
             <img class="card-front" src={getCardSrc(card)} alt={`Card ${card.value} of ${card.suit}`} />
           </div>

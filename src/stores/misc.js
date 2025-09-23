@@ -7,7 +7,12 @@ export const currentCard = writable(false);
 export const cycle1array = writable([]); // important! // sorted array after cycle1 (for use in pile2)
 export const cycle2array = writable([]); // sorted array after cycle2 (for use in pile3)
 export const cycle3array = writable([]);
+
+export const assembly1 = writable(false); // is true after drawing in pile1
 export const assembly2 = writable(false); // is true after drawing in pile2
+export const assembly3 = writable(false); // is true after drawing in pile3
+
+export const reveal = writable(false); // is true after reveal
 
 export const annotations = writable(true); //annotaions
 export const positions = writable(false); //positions

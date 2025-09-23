@@ -1,6 +1,8 @@
 <script>
-    import { arrayCards, statuscard } from '../../stores/misc.js';
+	import { Import } from 'lucide-svelte';
+    import { arrayCards, statuscard, assembly1 } from '../../stores/misc.js';
     import Arrow from '../items/Arrow.svelte';
+    import Up from '../items/JustUpArrow.svelte'
   
     $: rows = Array.from({ length: 9 }, (_, i) => $arrayCards.slice(i * 3, i * 3 + 3));
   
@@ -57,7 +59,7 @@
   </script>
   
   <main class="body">
-    {#if $statuscard}
+    {#if $statuscard && $assembly1}
       <header class="header">
         <h1><u>The First Cycle</u></h1>
         <p>Let's have a look at the cards inside the piles. <br> Here's where your card went.</p>
@@ -95,12 +97,29 @@
           </div>
         {/each}
       </div>
+      {:else}
+      <div class='else'> <p>
+        Click the <b>Top Arrow or press</b>
+        <Up/>
+        <b>to jump</b> to the <b>Cycle 1</b> step,<br />
+        then start drawing to see what’s really happening here!
+      </p>  </div>
     {/if}
   </main>
   
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap');
-  
+
+    .body:has(.else) { justify-content: center;  text-align: center; }
+
+
+    .else{
+      font-size: 2rem; 
+      font-family: 'Kumbh Sans', sans-serif;
+      color: #A34C48;
+     
+    }
+
     .body {
       height: 100vh;
       background-color: #FDD4D4;

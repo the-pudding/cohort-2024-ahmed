@@ -2,6 +2,7 @@
   import { lockedCard, statuscard } from '../../stores/misc.js';
 	import KeyboardDown from '../items/KeyboardDown.svelte';
   import KeyboardUp from '../items/KeyboardUp.svelte';
+  import Up from '../items/JustUpArrow.svelte'
 
   function DisplayValue(selectedValue) {
     if (selectedValue === 11) return 'Jack';
@@ -20,7 +21,7 @@
 
 <main class="container">
   <!-- <KeyboardUp/> -->
-  {#if $statuscard == true}
+  {#if $statuscard}
     <div class="content">
       <div class="left">
         <p>
@@ -37,12 +38,31 @@
         </div>
       </div>
     </div>
+    {:else}
+    <div class='else'>
+      <p>
+        Click the <b>Top Arrow or press</b>
+        <Up/>
+        <b>to jump</b> to the <b>Cards</b>
+        and pick one! 
+      </p>
+    </div>
   {/if}
 </main>
 
 <style>
 
 @import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap');
+
+.body:has(.else) { justify-content: center;  text-align: center; }
+
+
+.else{
+  font-size: 2rem; 
+  font-family: 'Kumbh Sans', sans-serif;
+  color: #A34C48;
+
+}
   .container {
     display: flex;
     justify-content: center;

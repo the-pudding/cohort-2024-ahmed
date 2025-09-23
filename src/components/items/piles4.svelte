@@ -1,6 +1,6 @@
 <script>
     import { crossfade, scale } from "svelte/transition";
-    import { cycle3array } from "../../stores/misc.js";
+    import { cycle3array, reveal } from "../../stores/misc.js";
     import cardback from '../../svg/Cards_png/back.png'
     // If you need to force-bundle assets, keep this import:
   
@@ -36,6 +36,7 @@
   
     let dealing = false;
     async function dealToFifteen() {
+      $reveal = true;
       if (dealing) return;
       dealing = true;
       while (midPile.length < 14 && leftPile.length) {

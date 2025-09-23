@@ -1,6 +1,7 @@
 <script>
     import { crossfade, scale } from "svelte/transition";
-    import { cycle3array } from "../../stores/misc.js";
+    import { cycle3array, reveal } from "../../stores/misc.js";
+    import Up from '../items/JustUpArrow.svelte'
     // If you need to force-bundle assets, keep this import:
   
     // Your helper
@@ -67,8 +68,9 @@
   </script>
 
 <audio src="/assets/deal.ogg"      bind:this={dealEl} preload="auto" />
-  
+{#if $reveal}
   <main class="stage">
+
     <!-- Left: Pile 1 (full deck at start) -->
     <section class="pile">
       <div class="title">Pile 1</div>
@@ -114,15 +116,36 @@
         {/if}
       </div>
     </section>
+
+    <div class="controls">
+      <button on:click={drawOne} disabled={count >= 14 || !leftPile.length}>Draw one</button>
+      <button on:click={dealToFifteen} disabled={count >= 14 || dealing}>Deal to 15</button>
+      <button on:click={reset}>Reset</button>
+    </div>
+   
   </main>
-  
-  <div class="controls">
-    <button on:click={drawOne} disabled={count >= 14 || !leftPile.length}>Draw one</button>
-    <button on:click={dealToFifteen} disabled={count >= 14 || dealing}>Deal to 15</button>
-    <button on:click={reset}>Reset</button>
-  </div>
+  {:else}
+  <div class='else'> <p>
+    Click the <b>Top Arrow or press</b>
+    <Up/>
+    <b>to jump</b> to the <b>Deck</b>,<br />
+    And Reveal your card!
+  </p> </div>
+{/if}
+ 
   
   <style>
+
+    .else{
+  min-height: 100vh;          /* give it vertical space */
+  display: grid;             /* easy centering */
+  place-items: center;       /* center both axes */
+  text-align: center;
+  font-size: 2rem;
+  font-family: 'Kumbh Sans', sans-serif;
+  color: #A34C48;
+}
+
     .stage {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;

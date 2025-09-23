@@ -6,7 +6,7 @@
 
   // your code
   import { allCards } from './cards.js';
-  import { arrayCards, currentCard , cycle2array } from '../../stores/misc.js';
+  import { arrayCards, currentCard , cycle2array, assembly3 } from '../../stores/misc.js';
 
   const [send, receive] = crossfade({
     fallback(node) {
@@ -29,11 +29,11 @@
   $: cards = Array.isArray($cycle2array) ? $cycle2array : [];
 
   // Derived lists (avoid inline filters in the markup)
-  $: undealt = cards.filter(Boolean).filter(d => !d.dealt);
+  $: undealt = cards.filter(Boolean).filter(d => !d.dealt3);
   $: piles = (() => {
     const map = { 1: [], 2: [], 3: [] };
     for (const c of cards) {
-      if (c?.dealt && (c.pile === 1 || c.pile === 2 || c.pile === 3)) {
+      if (c?.dealt3 && (c.pile === 1 || c.pile === 2 || c.pile === 3)) {
         map[c.pile].push(c);
       }
     }
@@ -54,10 +54,10 @@
     if (!selectedCard) return null;
 
     // Preferred: number like cycle2pile: 3
-    if (typeof selectedCard.cycle2pile === 'number') return selectedCard.cycle2pile;
+    if (typeof selectedCard.cycle3pile === 'number') return selectedCard.cycle3pile;
 
     // Fallbacks
-    const p = selectedCard?.cycle2pile?.pile;
+    const p = selectedCard?.cycle3pile?.pile;
     if (typeof p === 'number') return p;
     const m = /pile(\d+)/i.exec(String(p ?? ''));
     if (m) return Number(m[1]);
@@ -66,6 +66,8 @@
   }
 
   async function moveCardsToPiles() {
+    console.log('cycle2array',$cycle2array)
+    $assembly3 =true;
     animationStarted = true;
 
     // Work from a fresh snapshot to avoid mutating in place
@@ -80,7 +82,7 @@
         if (copy[i]) {
           copy[i] = {
             ...copy[i],
-            dealt: true,
+            dealt3: true,
             pile: (i % 3) + 1,
             zIndex: i + 1
           };
