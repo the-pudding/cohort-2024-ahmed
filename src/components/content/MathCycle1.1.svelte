@@ -97,6 +97,7 @@
           </div>
         {/each}
       </div>
+      <div class="footer2"><p>Division I</p></div>
       {:else}
       <div class='else'> <p>
         Click the <b>Top Arrow or press</b>
@@ -181,5 +182,7 @@
       font-family: "Nanum Pen Script", cursive;
       margin: 1% 0 1% 0;
     }
+    .footer2{ position:absolute; margin-right:4rem; margin-bottom:4rem; color:#4973B0; font-weight:bold; font-size:1.5rem; right:0; bottom:0; }
+ 
   </style>
   

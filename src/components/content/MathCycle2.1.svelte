@@ -111,7 +111,7 @@
       <div class="note" bind:this={note}>The Selected card</div>
   
       <div class="footer"></div>
-      <div class="footer2"><p>Division</p></div>
+      <div class="footer2"><p>Division II</p></div>
       {:else}
       <div class='else'>
         <p>

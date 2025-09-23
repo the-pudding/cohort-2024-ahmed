@@ -294,7 +294,7 @@
     {/if}
 
     <Annotations/>
-    <div class="footer"><p>Assembly</p></div>
+    <div class="footer"><p>Assembly II</p></div>
   {:else}
     <div class="else">
       <p>
@@ -413,7 +413,7 @@
   }
 
   .note{
-    position:absolute;
+    /* position:absolute; */
     left: calc(100% + 40px);
     top:50%;
     transform:translateY(-40%);
@@ -453,5 +453,5 @@
          padding:1rem; max-width:18rem; margin:1rem auto; text-align:center; }
   .descPos{ position:absolute; top:0; left:0; margin-top:3rem; margin-left:3rem; }
 
-  .footer{ position:absolute; right:0; bottom:0; margin:4rem; color:#4973B0; font-weight:bold; font-size:2rem; }
+  .footer{ position:absolute; right:0; bottom:0; margin:4rem; color:#4973B0; font-weight:bold; font-size:1.5rem; }
 </style>

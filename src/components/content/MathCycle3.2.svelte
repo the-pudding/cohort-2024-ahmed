@@ -301,7 +301,7 @@
     {/if}
 
     <Annotations/>
-    <div class="footer"><p>Assembly</p></div>
+    <div class="footer"><p>Assembly III</p></div>
   {:else}
     <div class="else">
       <p>
@@ -365,7 +365,7 @@
   }
   .band-i   { background:#558ABB; } /* I  (cycle1)  blue  */
   .band-ii  { background:#55993D; } /* II (cycle2)  green */
-  .band-iii { background:#cb72c3; } /* III(cycle3)  purple*/
+  .band-iii { background:#d187c9; } /* III(cycle3)  purple*/
 
   /* Single matches */
   .card.m1  .band-i   { display:flex; right:0; }
@@ -408,7 +408,7 @@
   }
 
   .note{
-    position:absolute;
+    /* position:absolute; */
     left: calc(100% + 40px);
     top:50%;
     transform:translateY(-40%);
@@ -448,5 +448,5 @@
          padding:1rem; max-width:18rem; margin:1rem auto; text-align:center; }
   .descPos{ position:absolute; top:0; left:0; margin-top:3rem; margin-left:3rem; }
 
-  .footer{ position:absolute; right:0; bottom:0; margin:4rem; color:#4973B0; font-weight:bold; font-size:2rem; }
+  .footer{ position:absolute; right:0; bottom:0; margin:4rem; color:#4973B0; font-weight:bold; font-size:1.5rem; }
 </style>
