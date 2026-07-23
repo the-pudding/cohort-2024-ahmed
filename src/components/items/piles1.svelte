@@ -1,8 +1,10 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, createEventDispatcher } from 'svelte';
   import { quintOut } from 'svelte/easing';
   import { crossfade } from 'svelte/transition';
   import { flip } from 'svelte/animate';
+
+  const dispatch = createEventDispatcher();
 
   // your code
   import { allCards } from './cards.js';
@@ -77,6 +79,11 @@
 
   // Handle pile button clicks
   function onPick(pileNumber, e) {
+    if (success && pileNumber === successPile) {
+      dispatch('goto', { y: 0, x: 2 }); // move to the next cycle
+      return;
+    }
+
     const selectedPile = getSelectedCycle1PileNumber();
     if (selectedPile == null) return;
 
@@ -160,7 +167,7 @@
               disabled={success && pileI !== successPile}
             >
               {#if success && pileI === successPile}
-                <p style='font-size: 0.7em'>Great, now let's move to the next cycle!</p>
+                <p style='font-size: 0.7em'>Great, let's do it again</p>
               {:else}
                 Pile {pileI}
               {/if}

@@ -1,8 +1,15 @@
 <script>
+  import { createEventDispatcher } from 'svelte';
   import { lockedCard, statuscard } from '../../stores/misc.js';
 	import KeyboardDown from '../items/KeyboardDown.svelte';
   import KeyboardUp from '../items/KeyboardUp.svelte';
   import Up from '../items/JustUpArrow.svelte'
+  import mathBack from '../../svg/mathBack.svg';
+
+  const dispatch = createEventDispatcher();
+  function jumpToCards() {
+    dispatch('goto', { y: 0, x: 0 });
+  }
 
   function DisplayValue(selectedValue) {
     if (selectedValue === 11) return 'Jack';
@@ -21,15 +28,15 @@
 
 <main class="container">
   <!-- <KeyboardUp/> -->
-  {#if $statuscard}
-    <div class="content">
-      <div class="left">
-        <p>
-          In this section we really don’t care about which card you chose, our only concern is to change the position of the card.
-          To track it, we will shade it a
-          <mark class="highlight">darker color</mark>.
-        </p>
-      </div>
+  <div class="content">
+    <div class="left">
+      <p>
+        In this section we really don’t care about which card you chose, our only concern is to change the position of the card.
+        To track it, we will shade it a
+        <mark class="highlight">darker color</mark>.
+      </p>
+    </div>
+    {#if $statuscard}
       <div class="right">
         <img class="card-front" src={getCardSrc($lockedCard)} alt={`Card ${$lockedCard.value} of ${$lockedCard.suit}`} />
         <div class="picked-text">
@@ -37,37 +44,28 @@
           <b class="card-label">{DisplayValue($lockedCard?.value)} of {$lockedCard?.suit}</b>
         </div>
       </div>
-    </div>
     {:else}
-    <div class='else'>
-      <p>
-        Click the <b>Top Arrow or press</b>
-        <Up/>
-        <b>to jump</b> to the <b>Cards</b>
-        and pick one! 
-      </p>
-    </div>
-  {/if}
+      <div class="right">
+        <div class="card-front">{@html mathBack}</div>
+        <div class="picked-text">
+          <p >You still haven't picked a card yet, please go back and select a card!</p>
+          <div class="up-wrap"> <p class="picked-text"></p><Up enableKeyboard={false} on:tap={jumpToCards}/></div>
+          <!-- <b class="picked-text">and select a card!</b> -->
+        </div>
+      </div>
+    {/if}
+  </div>
 </main>
 
 <style>
 
 @import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap');
 
-.body:has(.else) { justify-content: center;  text-align: center; }
-
-
-.else{
-  font-size: 2rem; 
-  font-family: 'Kumbh Sans', sans-serif;
-  color: #A34C48;
-
-}
   .container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 100%;
     background-color: #FDD4D4;
   }
 
@@ -110,6 +108,18 @@
     margin-bottom: 20px;
     border-radius: 10px;
     /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); */
+  }
+
+  :global(.card-front svg) {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .up-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 12px 0;
   }
 
   .picked-text {

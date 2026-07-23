@@ -1,12 +1,17 @@
 <script>
-  import { onMount, onDestroy, tick } from "svelte";
+  import { onMount, onDestroy, tick, createEventDispatcher } from "svelte";
   import { browser } from "$app/environment";                 // SSR guard
   import { get } from "svelte/store";
   import Arrow from "../items/Arrow.svelte";
   import Annotations from "../items/Annotations.svelte";
   import CurlyBraceCoords from "../items/Brace.svelte";
-  import { statuscard, cycle3array, annotations, positions, assembly3 } from "../../stores/misc.js";
+  import { statuscard, cycle3array, annotations, positions } from "../../stores/misc.js";
   import Up from "../items/JustUpArrow.svelte";
+
+  const dispatch = createEventDispatcher();
+  function jumpToCards() {
+    dispatch('goto', { y: 1, x: 0 });
+  }
 
   // ------- helpers -------
   const DisplaySuit = (suit) =>
@@ -180,7 +185,7 @@
 </script>
 
 <main class="body">
-  {#if $statuscard && $assembly3}
+  {#if $statuscard}
     {#if $annotations}
       <div class="descPos">
         <div class="desc">
@@ -306,9 +311,9 @@
     <div class="else">
       <p>
         Click the <b>Top Arrow or press</b>
-        <Up/>
-        <b>to jump</b> to the <b>Cycle 3</b> step,<br />
-        then start drawing to see what’s really happening here!
+        <Up enableKeyboard={false} on:tap={jumpToCards}/>
+        <b>to jump</b> to the <b>Cards</b>
+        and pick one!
       </p>
     </div>
   {/if}
@@ -327,7 +332,7 @@
   }
 
   .body{
-    height:100vh; background:#FDD4D4;
+    height:100%; background:#FDD4D4;
     display:flex; flex-direction:column; align-items:center; justify-content:space-between;
     font-family:'Kumbh Sans',sans-serif; color:#A34C48;
   }

@@ -1,8 +1,14 @@
 <script>
-    import { arrayCards, statuscard, cycle1array, assembly2 } from '../../stores/misc.js';
+    import { arrayCards, statuscard, cycle1array } from '../../stores/misc.js';
     import Arrow from '../items/Arrow.svelte';
     import Up from '../items/JustUpArrow.svelte'
-  
+    import { createEventDispatcher } from 'svelte';
+
+    const dispatch = createEventDispatcher();
+    function jumpToCards() {
+      dispatch('goto', { y: 1, x: 0 });
+    }
+
     let rows = [];
   
     // which pile contains the selected card?
@@ -69,7 +75,7 @@
   </script>
   
   <main class="body">
-    {#if $statuscard && $assembly2}
+    {#if $statuscard}
       <header class="header">
         <h1><u>The Second Cycle</u></h1>
         <p>Let's have a look at the cards inside the piles. <br />Here's where your card went.</p>
@@ -116,9 +122,9 @@
       <div class='else'>
         <p>
           Click the <b>Top Arrow or press</b>
-          <Up/>
-          <b>to jump</b> to the <b>Cycle 2</b> step,<br />
-          then start drawing to see what’s really happening here!
+          <Up enableKeyboard={false} on:tap={jumpToCards}/>
+          <b>to jump</b> to the <b>Cards</b>
+          and pick one!
         </p> </div>
     {/if}
   </main>
@@ -137,7 +143,7 @@
     }
   
     .body{
-      height:100vh; background:#FDD4D4;
+      height:100%; background:#FDD4D4;
       display:flex; flex-direction:column; align-items:center; justify-content:space-between;
       font-family:'Kumbh Sans',sans-serif; color:#A34C48;
     }

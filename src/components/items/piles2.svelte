@@ -1,5 +1,5 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, createEventDispatcher } from 'svelte';
   import { quintOut } from 'svelte/easing';
   import { crossfade } from 'svelte/transition';
   import { flip } from 'svelte/animate';
@@ -7,6 +7,8 @@
   // your code
   import { allCards } from './cards.js';
   import { arrayCards, currentCard , cycle1array, assembly2} from '../../stores/misc.js';
+
+  const dispatch = createEventDispatcher();
 
   const [send, receive] = crossfade({
     fallback(node) {
@@ -77,6 +79,11 @@
 
   // Handle pile button clicks
   function onPick(pileNumber, e) {
+    if (success && pileNumber === successPile) {
+      dispatch('goto', { y: 0, x: 3 }); // move to the next cycle
+      return;
+    }
+
     const selectedPile = getSelectedCycle2PileNumber();
     if (selectedPile == null) return;
 
@@ -160,7 +167,7 @@
               disabled={success && pileI !== successPile}
             >
               {#if success && pileI === successPile}
-                <p style='font-size: 0.7em'>Great, now let's move to the next cycle!</p>
+                <p style='font-size: 0.7em'>Alright, one last time!</p>
               {:else}
                 Pile {pileI}
               {/if}

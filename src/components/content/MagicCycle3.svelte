@@ -31,7 +31,7 @@
         }
 
         .container{
-            height: 100vh;
+            height: 100%;
             background-color: #BFAFF7;
         }
   

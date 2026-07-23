@@ -13,7 +13,7 @@
   
     // Magic => vertical 0, horizontal 1  (Slide1)
     // Math  => vertical 1, horizontal 0  (Slide3)
-    if (choice === "Math") dispatch("goto", { y: 0, x: 1 });
+    if (choice === "Math") dispatch("goto", { y: 0, x: 0 });
     else                    dispatch("goto", { y: 1, x: 0 })
     triggerReset();;
   }
@@ -61,7 +61,7 @@
   <style>
 
 .end {
-    min-height: 100vh;
+    min-height: 100%;
     background-color: #BEAFF7; 
     padding-top: 2em;
   }

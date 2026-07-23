@@ -26,7 +26,7 @@ import KeyboardUp from "../items/KeyboardUp.svelte";
       @import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap');
 
     .body{
-        height: 100vh;
+        height: 100%;
         margin-top: 0;
         background-color: #FDD4D4;
         padding-top: 2em;

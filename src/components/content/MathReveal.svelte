@@ -6,7 +6,7 @@
     <body>
         <!-- <KeyboardUp/> -->
         <div class='piles'>
-            <CardsExpl/>
+            <CardsExpl on:goto/>
         </div>
         
     <!-- <div class='text'>
@@ -21,7 +21,7 @@
           @import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@400;700&display=swap');
     
         body{
-            height: 100vh;
+            height: 100%;
             margin-top: 0;
             background-color: #FDD4D4;
         }

@@ -24,7 +24,7 @@ Usage:
 </Slider>
 -->
 <script>
-	import { setContext, onMount } from "svelte";
+	import { setContext, onMount, tick } from "svelte";
 	import { writable } from "svelte/store";
 
 	export let direction = "horizontal";
@@ -38,11 +38,22 @@ Usage:
 	export const prev = () => move(-1);
 	export const jump = (val) => move(val, true);
 
+	// Snap to a slide with no transition, e.g. to reposition a hidden
+	// row before it becomes visible so it doesn't visibly slide over.
+	export const jumpInstant = async (val) => {
+		durationOverride = "0ms";
+		move(val, true);
+		await tick();
+		await new Promise(requestAnimationFrame);
+		durationOverride = null;
+	};
+
 	let children = 0;
 	let index = 0;
 	let width;
 	let height;
 	let isInView = false;
+	let durationOverride = null;
 	let sliderEl;
 	let translateEl;
 	let root;
@@ -57,7 +68,7 @@ Usage:
 	// $: console.log({current, direction})
 
 	const move = (val, jump) => {
-		if (!isInView) return false;
+		if (!isInView && !jump) return false;
 		const target = jump ? val : index + val;
 		index = Math.max(0, Math.min(children - 1, target));
 
@@ -77,7 +88,7 @@ Usage:
 	$: sW = `width: ${w};`;
 	$: sH = `height: ${h};`;
 	$: sT = `transform: translate3d(${x}, ${y}, 0);`;
-	$: sTD = `transition-duration: ${duration};`;
+	$: sTD = `transition-duration: ${durationOverride ?? duration};`;
 	$: sTTF = `transition-timing-function: ${timing};`;
 	$: customStyle = `${sW} ${sH} ${sT} ${sTD} ${sTTF}`;
 

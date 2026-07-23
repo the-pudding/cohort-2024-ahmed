@@ -10,7 +10,7 @@
   <!-- <KeyboardDown/> -->
   <Dacard/>
   {/if}
-  <Piles/>
+  <Piles on:goto/>
  <!-- <p> your card is : {$lockedCard?.suit}</p> -->
 </div>
 
@@ -18,7 +18,7 @@
 <style>
 
         .container{
-            height: 100vh;
+            height: 100%;
             background-color: #BFAFF7;
         }
 

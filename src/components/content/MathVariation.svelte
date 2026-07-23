@@ -85,7 +85,7 @@
       margin-top: .4rem;
     }
     body{
-            height: 100vh;
+            height: 100%;
             margin-top: 0;
             background-color: #FDD4D4;
         }

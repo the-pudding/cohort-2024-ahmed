@@ -46,7 +46,7 @@
     <!-- <KeyboardDown/> -->
     <Dacard/>
     {/if}
-    <Piles/>
+    <Piles on:goto/>
 
     <!-- <button on:click={logStores}
   class="px-3 py-2 rounded-md border"
@@ -60,7 +60,7 @@
   <style>
   
           .container{
-              height: 100vh;
+              height: 100%;
               background-color: #BFAFF7;
           }
   

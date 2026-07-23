@@ -34,7 +34,7 @@
     } */
 
     .body {
-        height: 100vh;
+        height: 100%;
         margin-top: 0;
         background-color: #BFAFF7;
         padding-top: 2em;
